@@ -1,30 +1,74 @@
 import argparse
+import requests
+import base64
+import json
 from util import extract_public_key, verify_artifact_signature
 from merkle_proof import DefaultHasher, verify_consistency, verify_inclusion, compute_leaf_hash
 
 def get_log_entry(log_index, debug=False):
-    # verify that log index value is sane
-    pass
+    params = {'logIndex': log_index}
+    url = "https://rekor.sigstore.dev/api/v1/log/entries"
+    response = requests.get(url, params=params)
+    return handle_response(response)
 
-def get_verification_proof(log_index, debug=False):
-    # verify that log index value is sane
-    pass
+def get_verification_proof(log_entry, uuid, debug=False):
+    leaf_hash = compute_leaf_hash(log_entry.get(uuid).get('body'))
+    inclusionProof = log_entry.get(uuid).get('verification').get('inclusionProof')
+    index = inclusionProof.get('logIndex')
+    root_hash = inclusionProof.get('rootHash')
+    tree_size = inclusionProof.get('treeSize')
+    hashes = inclusionProof.get('hashes')
+    return leaf_hash, index, root_hash, tree_size, hashes
 
 def inclusion(log_index, artifact_filepath, debug=False):
-    # verify that log index and artifact filepath values are sane
-    # extract_public_key(certificate)
-    # verify_artifact_signature(signature, public_key, artifact_filepath)
-    # get_verification_proof(log_index)
-    # verify_inclusion(DefaultHasher, index, tree_size, leaf_hash, hashes, root_hash)
-    pass
+    log_entry = get_log_entry(log_index)
+    uuid = next(iter(log_entry.keys()))
+    body = json.loads(base64_decode(log_entry.get(uuid).get('body')))
+    signature = base64_decode(body.get('spec').get('signature').get('content'))
+    certificate = base64_decode(
+        body.get('spec').get('signature').get('publicKey').get('content'))
+    public_key = extract_public_key(certificate)
+    verify_artifact_signature(signature, public_key, artifact_filepath)
+
+    leaf_hash, index, root_hash, tree_size, hashes = get_verification_proof(
+        log_entry, uuid)
+    verify_inclusion(DefaultHasher, index, tree_size, leaf_hash, hashes, root_hash)
+
+def base64_decode(encoded_str):
+    return base64.b64decode(encoded_str)
+
+def handle_response(response):
+    if response.status_code == 200:
+        return response.json()
+    else:
+        response.raise_for_status()
 
 def get_latest_checkpoint(debug=False):
-    pass
+    url = 'https://rekor.sigstore.dev/api/v1/log'
+    response = requests.get(url)
+    return handle_response(response)
 
 def consistency(prev_checkpoint, debug=False):
     # verify that prev checkpoint is not empty
-    # get_latest_checkpoint()
-    pass
+    latest_checkpoint = get_latest_checkpoint()
+    latest_root_hash = latest_checkpoint.get('rootHash')
+    latest_tree_id = latest_checkpoint.get('treeID')
+    latest_tree_size = latest_checkpoint.get('treeSize')
+    prev_tree_size = prev_checkpoint.get('treeSize')
+    prev_tree_id = prev_checkpoint.get('treeID')
+    prev_root = prev_checkpoint.get('rootHash')
+
+    url = 'https://rekor.sigstore.dev/api/v1/log/proof'
+    params = {
+        'firstSize': prev_tree_size,
+        'lastSize': latest_tree_size,
+        'treeID': prev_tree_id
+    }
+    response = requests.get(url, params=params)
+    hashes = handle_response(response).get('hashes')
+    verify_consistency(DefaultHasher, prev_tree_size, latest_tree_size,
+                       hashes, prev_root, latest_root_hash)
+    print('Consistency verification successful')
 
 def main():
     debug = False
