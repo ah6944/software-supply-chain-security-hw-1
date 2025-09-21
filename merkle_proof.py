@@ -143,6 +143,7 @@ def verify_inclusion(hasher, index, size, leaf_hash, proof, root, debug=False):
     bytearray_leaf = bytes.fromhex(leaf_hash)
     calc_root = root_from_inclusion_proof(hasher, index, size, bytearray_leaf, bytearray_proof)
     verify_match(calc_root, bytearray_root)
+    print('Offline root hash calculation for inclusion verified')
     if debug:
         print("Calculated root hash", calc_root.hex())
         print("Given root hash", bytearray_root.hex())
