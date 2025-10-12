@@ -51,11 +51,19 @@ def get_latest_checkpoint(debug=False):
 def consistency(prev_checkpoint, debug=False):
     # verify that prev checkpoint is not empty
     latest_checkpoint = get_latest_checkpoint()
-    latest_root_hash = latest_checkpoint.get('rootHash')
     latest_tree_id = latest_checkpoint.get('treeID')
-    latest_tree_size = latest_checkpoint.get('treeSize')
-    prev_tree_size = prev_checkpoint.get('treeSize')
     prev_tree_id = prev_checkpoint.get('treeID')
+
+    if (latest_tree_id != prev_tree_id):
+        print('The treeIDs of the latest and previous checkpoints do not match:\n'
+              f'\tLatest checkpoint treeId: {latest_tree_id}\n'
+              f'\tPrevious checkpoint treeId: {prev_tree_id}')
+        return
+
+    latest_root_hash = latest_checkpoint.get('rootHash')
+    latest_tree_size = latest_checkpoint.get('treeSize')
+
+    prev_tree_size = prev_checkpoint.get('treeSize')
     prev_root = prev_checkpoint.get('rootHash')
 
     url = 'https://rekor.sigstore.dev/api/v1/log/proof'
