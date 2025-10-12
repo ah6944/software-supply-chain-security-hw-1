@@ -9,29 +9,36 @@ def get_log_entry(log_index, debug=False):
     params = {'logIndex': log_index}
     url = "https://rekor.sigstore.dev/api/v1/log/entries"
     response = requests.get(url, params=params)
-    return handle_response(response)
+    result = handle_response(response)
+
+    if debug:
+        save_json_to_file(json.dumps(result, indent=4), 'log_entry.json')
+
+    return result
 
 def get_verification_proof(log_entry, uuid, debug=False):
-    leaf_hash = compute_leaf_hash(log_entry.get(uuid).get('body'))
-    inclusionProof = log_entry.get(uuid).get('verification').get('inclusionProof')
-    index = inclusionProof.get('logIndex')
-    root_hash = inclusionProof.get('rootHash')
-    tree_size = inclusionProof.get('treeSize')
-    hashes = inclusionProof.get('hashes')
+    leaf_hash = compute_leaf_hash(get_nested_field(log_entry, f'{uuid}.body'))
+    inclusionProof = get_nested_field(log_entry, f'{uuid}.verification.inclusionProof')
+    index, root_hash, tree_size, hashes = [inclusionProof.get(key) for key in ('logIndex', 'rootHash', 'treeSize', 'hashes')]
+
+    if debug:
+        print(f'index: {index}\nroot_hash: {root_hash}\ntree_size: {tree_size}\nhashes: {json.dumps(hashes, indent=4)}')
+
     return leaf_hash, index, root_hash, tree_size, hashes
 
 def inclusion(log_index, artifact_filepath, debug=False):
-    log_entry = get_log_entry(log_index)
+    log_entry = get_log_entry(log_index, debug)
     uuid = next(iter(log_entry.keys()))
-    body = json.loads(base64_decode(log_entry.get(uuid).get('body')))
-    signature = base64_decode(body.get('spec').get('signature').get('content'))
-    certificate = base64_decode(
-        body.get('spec').get('signature').get('publicKey').get('content'))
+    body = json.loads(base64_decode(get_nested_field(log_entry, f'{uuid}.body')))
+    signature = base64_decode(get_nested_field(body, 'spec.signature.content'))
+    certificate = base64_decode(get_nested_field(body, 'spec.signature.publicKey.content'))
     public_key = extract_public_key(certificate)
+
     verify_artifact_signature(signature, public_key, artifact_filepath)
 
     leaf_hash, index, root_hash, tree_size, hashes = get_verification_proof(
-        log_entry, uuid)
+        log_entry, uuid, debug)
+
     verify_inclusion(DefaultHasher, index, tree_size, leaf_hash, hashes, root_hash)
 
 def base64_decode(encoded_str):
@@ -43,14 +50,34 @@ def handle_response(response):
     else:
         response.raise_for_status()
 
+def get_nested_field(obj, field_path):
+    fields = field_path.split('.')
+
+    for field in fields:
+        obj = obj.get(field)
+
+        if obj is None:
+            print(f'Field {field} returned None')
+
+    return obj
+
+def save_json_to_file(json, file_name):
+    with open(file_name, "w") as file:
+        file.write(json)
+
 def get_latest_checkpoint(debug=False):
     url = 'https://rekor.sigstore.dev/api/v1/log'
     response = requests.get(url)
-    return handle_response(response)
+    result = handle_response(response)
+
+    if debug:
+        save_json_to_file(json.dumps(result, indent=4), 'checkpoint.json')
+
+    return result
 
 def consistency(prev_checkpoint, debug=False):
     # verify that prev checkpoint is not empty
-    latest_checkpoint = get_latest_checkpoint()
+    latest_checkpoint = get_latest_checkpoint(debug)
     latest_tree_id = latest_checkpoint.get('treeID')
     prev_tree_id = prev_checkpoint.get('treeID')
 
