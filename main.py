@@ -40,6 +40,7 @@ def inclusion(log_index, artifact_filepath, debug=False):
         log_entry, uuid, debug)
 
     verify_inclusion(DefaultHasher, index, tree_size, leaf_hash, hashes, root_hash)
+    print('Offline root hash calculation for inclusion verified')
 
 def base64_decode(encoded_str):
     return base64.b64decode(encoded_str)
