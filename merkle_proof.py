@@ -23,9 +23,9 @@ class Hasher:
         h.update(leaf)
         return h.digest()
 
-    def hash_children(self, l, r):
+    def hash_children(self, left_child, right_child):
         h = self.new()
-        b = bytes([RFC6962_NODE_HASH_PREFIX]) + l + r
+        b = bytes([RFC6962_NODE_HASH_PREFIX]) + left_child + right_child
         h.update(b)
         return h.digest()
 
@@ -55,7 +55,9 @@ def verify_consistency(hasher, size1, size2, proof, root1, root2):
     if size1 == 0:
         if bytearray_proof:
             raise ValueError(
-                f"expected empty bytearray_proof, but got {len(bytearray_proof)} components"
+                f"""
+                             expected empty bytearray_proof, but got
+                             {len(bytearray_proof)} components"""
             )
         return
     if not bytearray_proof:
@@ -72,7 +74,9 @@ def verify_consistency(hasher, size1, size2, proof, root1, root2):
 
     if len(bytearray_proof) != start + inner + border:
         raise ValueError(
-            f"wrong bytearray_proof size {len(bytearray_proof)}, want {start + inner + border}"
+            f"""
+                         wrong bytearray_proof size {len(bytearray_proof)},
+                         want {start + inner + border}"""
         )
 
     bytearray_proof = bytearray_proof[start:]
@@ -130,7 +134,9 @@ class RootMismatchError(Exception):
         self.calculated_root = binascii.hexlify(bytearray(calculated_root))
 
     def __str__(self):
-        return f"calculated root:\n{self.calculated_root}\n does not match expected root:\n{self.expected_root}"
+        return f"""
+        calculated root:\n{self.calculated_root}\n does not match expected
+        root:\n{self.expected_root}"""
 
 
 def root_from_inclusion_proof(hasher, index, size, leaf_hash, proof):

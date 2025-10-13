@@ -33,7 +33,10 @@ def get_verification_proof(log_entry, uuid, debug=False):
 
     if debug:
         print(
-            f"index: {index}\nroot_hash: {root_hash}\ntree_size: {tree_size}\nhashes: {json.dumps(hashes, indent=4)}"
+            f"index: {index}\n"
+            f"root_hash: {root_hash}\n"
+            f"tree_size: {tree_size}\n"
+            f"hashes: {json.dumps(hashes, indent=4)}"
         )
 
     return leaf_hash, index, root_hash, tree_size, hashes
