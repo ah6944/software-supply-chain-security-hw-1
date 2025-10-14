@@ -26,7 +26,7 @@ def get_log_entry(log_index, debug=False):
 
     Args:
         log_index (int): Index of the log entry.
-        debug (bool, optional): If True, the log entry will be saved to a file. 
+        debug (bool, optional): If True, the log entry will be saved to a file.
         Defaults to False.
 
     Returns:
@@ -50,12 +50,12 @@ def get_verification_proof(log_entry, uuid, debug=False):
     Args:
         log_entry (dict): The log entry from Rekor.
         uuid (str): The unique identifier of the log entry.
-        debug (bool, optional): If True, the data for the verification proof 
+        debug (bool, optional): If True, the data for the verification proof
         will be printed. Defaults to False.
 
     Returns:
-        tuple: A tuple that contains the leaf hash of the log entry, the log 
-        index, the root hash of the Merkle tree, the size of the Merkle tree, 
+        tuple: A tuple that contains the leaf hash of the log entry, the log
+        index, the root hash of the Merkle tree, the size of the Merkle tree,
         and the log entry's inclusion proof hashes.
     """
     leaf_hash = compute_leaf_hash(get_nested_field(log_entry, f"{uuid}.body"))
@@ -84,7 +84,7 @@ def inclusion(log_index, artifact_filepath, debug=False):
         log_index (int): The index in the transparency log of the entry in
         which to verify its inclusion.
         artifact_filepath (str): The filepath to the artifact.
-        debug (bool, optional): If True, saves the log entry to a file. Defaults 
+        debug (bool, optional): If True, saves the log entry to a file. Defaults
         to False.
     """
     log_entry = get_log_entry(log_index, debug)
@@ -208,7 +208,7 @@ def consistency(prev_checkpoint, debug=False):
     Args:
         prev_checkpoint (dict): A dictionary containing the details of a
         previous checkpoint.
-        debug (bool, optional): If True, saves the latest checkpoint to a file. 
+        debug (bool, optional): If True, saves the latest checkpoint to a file.
         Defaults to False.
     """
     latest_checkpoint = get_latest_checkpoint(debug)
