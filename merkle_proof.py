@@ -1,3 +1,6 @@
+"""
+Utility class with Merkle tree operations.
+"""
 import hashlib
 import binascii
 import base64
@@ -8,28 +11,67 @@ RFC6962_NODE_HASH_PREFIX = 1
 
 
 class Hasher:
+    """
+    A utility class for performing hash operations.
+    """
     def __init__(self, hash_func=hashlib.sha256):
         self.hash_func = hash_func
 
     def new(self):
+        """
+        Creates a new Hasher instance.
+
+        Returns:
+            hashlib._hashlib.HASH: A new hash object.
+        """
         return self.hash_func()
 
     def empty_root(self):
+        """
+        Computes the hash of an empty tree.
+
+        Returns:
+            bytes: The hash of an empty tree.
+        """
         return self.new().digest()
 
     def hash_leaf(self, leaf):
+        """Computes the hash of a leaf.
+
+        Args:
+            leaf (bytes): The leaf to hash.
+
+        Returns:
+            bytes: The hash of the leaf.
+        """
         h = self.new()
         h.update(bytes([RFC6962_LEAF_HASH_PREFIX]))
         h.update(leaf)
         return h.digest()
 
     def hash_children(self, left_child, right_child):
+        """
+        Given the hashes of the two child leaves, computes the hash of the
+        parent.
+
+        Args:
+            left_child (bytes): The hash of the left child.
+            right_child (bytes): The hash of the right child.
+
+        Returns:
+            bytes: The parent hash.
+        """
         h = self.new()
         b = bytes([RFC6962_NODE_HASH_PREFIX]) + left_child + right_child
         h.update(b)
         return h.digest()
 
     def size(self):
+        """Gets the size of the hash.
+
+        Returns:
+            int: The size of the hash.
+        """
         return self.new().digest_size
 
 
@@ -37,7 +79,28 @@ class Hasher:
 DefaultHasher = Hasher(hashlib.sha256)
 
 
-def verify_consistency(hasher, size1, size2, proof, root1, root2):
+def verify_consistency(params):
+    """
+    Verifies the consistency of two roots in the Merkle tree.
+
+    Args:
+        params (dict): A dictionary with the following keys:
+            - hasher (Hasher): The hasher used for hashing.
+            - size1 (int): The size of the previous tree.
+            - size2 (int): The size of the latest tree.
+            - proof (list): The list of hashes used for verifying consistency.
+            - root1 (str): The hex-encoded root hash of the previous tree.
+            - root2 (str): The hex-encoded root hash of the latest tree.
+
+    Raises:
+        ValueError: If the proof is invalid or the tree sizes are not consistent.
+        RootMismatchError: If the calculated and expected roots do not match.
+    """
+    hasher, size1, size2, proof, root1, root2 = [
+        params.get(key)
+        for key in ("hasher", "size1", "size2", "proof", "root1", "root2")
+    ]
+
     # change format of args to be bytearray instead of hex strings
     root1 = bytes.fromhex(root1)
     root2 = bytes.fromhex(root2)
@@ -92,21 +155,66 @@ def verify_consistency(hasher, size1, size2, proof, root1, root2):
 
 
 def verify_match(calculated, expected):
+    """
+    Verifies that the calculated and expected roots are equal.
+
+    Args:
+        calculated (bytes): The calculated root hash.
+        expected (bytes): The expected root hash.
+
+    Raises:
+        RootMismatchError: If there is a mismatch between the calculated and
+        expected roots.
+    """
     if calculated != expected:
         raise RootMismatchError(expected, calculated)
 
 
 def decomp_incl_proof(index, size):
+    """
+    Breaks down the inclusion proof into smaller components.
+
+    Args:
+        index (int): The tree leaf index.
+        size (int): The size of the tree.
+
+    Returns:
+        tuple: A tuple consisting of:
+            - inner (int): The size of the inner proof.
+            - border (int): The size of the border proof.
+    """
     inner = inner_proof_size(index, size)
     border = bin(index >> inner).count("1")
     return inner, border
 
 
 def inner_proof_size(index, size):
+    """
+    Gets the size of the inner proof.
+
+    Args:
+        index (int): The tree leaf index.
+        size (int): The tree size.
+
+    Returns:
+        int: The size of the inner proof.
+    """
     return (index ^ (size - 1)).bit_length()
 
 
 def chain_inner(hasher, seed, proof, index):
+    """
+    Using the proof, computes the hash of the inner chain.
+
+    Args:
+        hasher (Hasher): The hasher used for hashing.
+        seed (bytes): The initial hash.
+        proof (int): The proof hashes.
+        index (int): The tree leaf index.
+
+    Returns:
+        bytes: The hash of the inner chain.
+    """
     for i, h in enumerate(proof):
         if (index >> i) & 1 == 0:
             seed = hasher.hash_children(seed, h)
@@ -116,6 +224,18 @@ def chain_inner(hasher, seed, proof, index):
 
 
 def chain_inner_right(hasher, seed, proof, index):
+    """
+    Computes the hash of the inner right chain.
+
+    Args:
+        hasher (Hasher): The hasher used for hashing.
+        seed (bytes): The initial hash.
+        proof (list): The proof hashes.
+        index (int): The tree leaf index.
+
+    Returns:
+        bytes: The hash of the inner right chain.
+    """
     for i, h in enumerate(proof):
         if (index >> i) & 1 == 1:
             seed = hasher.hash_children(h, seed)
@@ -123,12 +243,27 @@ def chain_inner_right(hasher, seed, proof, index):
 
 
 def chain_border_right(hasher, seed, proof):
+    """
+    Computes the hash of the right border chain.
+
+    Args:
+        hasher (Hasher): The hasher used for hashing.
+        seed (bytes): The initial hash.
+        proof (list): The proof hashes.
+
+    Returns:
+        bytes: The hash of the right border chain.
+    """
     for h in proof:
         seed = hasher.hash_children(h, seed)
     return seed
 
 
 class RootMismatchError(Exception):
+    """
+    Exception raised when there is a mismatch between the calculated
+    and expected roots.
+    """
     def __init__(self, expected_root, calculated_root):
         self.expected_root = binascii.hexlify(bytearray(expected_root))
         self.calculated_root = binascii.hexlify(bytearray(calculated_root))
@@ -140,6 +275,22 @@ class RootMismatchError(Exception):
 
 
 def root_from_inclusion_proof(hasher, index, size, leaf_hash, proof):
+    """
+    Computes the root hash given the inclusion proof hashes.
+
+    Args:
+        hasher (Hasher): The hasher used for hashing.
+        index (int): The tree leaf index.
+        size (int): The size of the tree.
+        leaf_hash (bytes): The leaf hash.
+        proof (list): The inclusion proof hashes.
+
+    Raises:
+        ValueError: If the size of the leaf hash or proof is invalid.
+
+    Returns:
+        bytes: The root hash.
+    """
     if index >= size:
         raise ValueError(f"index is beyond size: {index} >= {size}")
 
@@ -157,7 +308,24 @@ def root_from_inclusion_proof(hasher, index, size, leaf_hash, proof):
     return res
 
 
-def verify_inclusion(hasher, index, size, leaf_hash, proof, root, debug=False):
+def verify_inclusion(params, debug=False):
+    """
+    Verifies that a leaf is in the tree.
+
+    Args:
+        params (dict): A dictionary consisting of the following:
+            - hasher (Hasher): The hasher used for hashing.
+            - index (int): The tree leaf index.
+            - size (int): The tree size.
+            - leaf_hash (str): The leaf hash.
+            - proof (list): The list of inclusion proof hashes.
+            - root (str): The root hash of the tree.
+        debug (bool, optional): If True, prints debug information. Defaults to False.
+    """
+    hasher, index, size, leaf_hash, proof, root = [
+        params.get(key)
+        for key in ("hasher", "index", "size", "leaf_hash", "proof", "root")
+    ]
     bytearray_proof = []
     for elem in proof:
         bytearray_proof.append(bytes.fromhex(elem))
@@ -176,6 +344,15 @@ def verify_inclusion(hasher, index, size, leaf_hash, proof, root, debug=False):
 # requires entry["body"] output for a log entry
 # returns the leaf hash according to the rfc 6962 spec
 def compute_leaf_hash(body):
+    """
+    Computes the hash of the leaf.
+
+    Args:
+        body (str): The base64-encoded log entry body.
+
+    Returns:
+        str: The leaf hash.
+    """
     entry_bytes = base64.b64decode(body)
 
     # create a new sha256 hash object
