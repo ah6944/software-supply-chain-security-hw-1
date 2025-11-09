@@ -1,0 +1,7 @@
+repos:
+  - repo: local
+    hooks:
+      - id: trufflehog
+        name: TruffleHog Secret Scanner
+        entry: bash -c 'git diff --cached --name-only | xargs -I {} trufflehog filesystem --fail {}'
+        language: system
