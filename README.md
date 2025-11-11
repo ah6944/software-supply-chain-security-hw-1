@@ -44,7 +44,7 @@ details. Once obtained, the following command will perform the consistency
 verification:
 
 ```bash
-python main.py --consistency --tree-id <treeId> --treeSize <treeSize> --rootHash <rootHash>
+python main.py --consistency --tree-id <treeId> --tree-size <treeSize> --root-hash <rootHash>
 ```
 
 ## Installation
