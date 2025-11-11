@@ -6,7 +6,7 @@ authors = [
     {name = "Alexander Hom", email = "alexanderhom19@gmail.com"},
     ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "mypy (>=1.18.2,<2.0.0)",
     "black (>=25.11.0,<26.0.0)",
@@ -25,3 +25,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.flake8]
 max-line-length = 88
 ignore = ["E203", "W503"]
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.0,<10.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)",
+    "jsonschema (>=4.25.1,<5.0.0)"
+]
