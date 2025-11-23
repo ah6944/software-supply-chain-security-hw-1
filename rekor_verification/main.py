@@ -11,8 +11,8 @@ import argparse
 import base64
 import json
 import requests
-from util import extract_public_key, verify_artifact_signature
-from merkle_proof import (
+from .util import extract_public_key, verify_artifact_signature
+from .merkle_proof import (
     DefaultHasher,
     verify_consistency,
     verify_inclusion,
