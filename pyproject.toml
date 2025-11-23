@@ -1,5 +1,5 @@
 [project]
-name = "software-supply-chain-security-hw-1"
+name = "rekor-verification"
 version = "0.1.0"
 description = ""
 authors = [
