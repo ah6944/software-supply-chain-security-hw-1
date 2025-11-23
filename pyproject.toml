@@ -32,3 +32,6 @@ dev = [
     "pytest-cov (>=7.0.0,<8.0.0)",
     "jsonschema (>=4.25.1,<5.0.0)"
 ]
+
+[project.scripts]
+rekor-verification = "rekor_verification.main:main"
