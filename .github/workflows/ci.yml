@@ -43,4 +43,4 @@ jobs:
           extra_args: --results=verified,unknown
 
       - name: Run tests with coverage
-        run: poetry run pytest --cov=. --cov-report=term
+        run: PYTHONPATH=. poetry run pytest --cov=. --cov-report=term
