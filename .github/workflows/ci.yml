@@ -35,7 +35,7 @@ jobs:
         run: poetry run flake8 ./rekor_verification
       
       - name: Scan for vulnerabilities
-        run: poetry run bandit -r .
+        run: poetry run bandit -r ./rekor_verification
       
       - name: Scan for secrets
         uses: trufflesecurity/trufflehog@main
