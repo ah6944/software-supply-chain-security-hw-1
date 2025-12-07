@@ -3,7 +3,7 @@ name: CD workflow
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*'
 
 permissions:
   id-token: write
@@ -56,4 +56,4 @@ jobs:
         with:
           files: dist/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
