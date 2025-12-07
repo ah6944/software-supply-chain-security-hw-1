@@ -1,0 +1,46 @@
+name: CI workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.13
+
+      - name: Install Poetry
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Check code formatting
+        run: poetry run ruff .
+
+      - name: Run lint checks
+        run: poetry run flake8 .
+      
+      - name: Scan for vulnerabilities
+        run: poetry run bandit -r .
+      
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --results=verified,unknown
+
+      - name: Run tests with coverage
+        run: poetry run pytest --cov=. --cov-report=term
