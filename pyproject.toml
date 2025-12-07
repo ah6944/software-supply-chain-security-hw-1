@@ -1,6 +1,6 @@
 [project]
 name = "rekor-verification"
-version = "4.0.2"
+version = "4.0.3"
 description = "A Python script for verifying Rekor logs"
 authors = [{ name = "Alexander Hom", email = "alexanderhom19@gmail.com" }]
 readme = "README.md"
