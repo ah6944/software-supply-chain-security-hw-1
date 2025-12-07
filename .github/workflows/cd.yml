@@ -3,7 +3,7 @@ name: CD workflow
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 permissions:
   id-token: write
