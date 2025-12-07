@@ -43,7 +43,7 @@ jobs:
           path: dist/
 
       - name: Generate SBOM
-        run: python -m cyclonedx_py venv -o cyclonedx-sbom.json
+        run: poetry run cyclonedx-bom venv -o cyclonedx-sbom.json
 
       - name: Attest SBOM
         uses: actions/attest-sbom@v3
