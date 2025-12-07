@@ -29,7 +29,7 @@ jobs:
         run: poetry install
 
       - name: Check code formatting
-        run: poetry run ruff .
+        run: poetry run ruff check .
 
       - name: Run lint checks
         run: poetry run flake8 .
