@@ -44,3 +44,17 @@ jobs:
 
       - name: Run tests with coverage
         run: PYTHONPATH=. poetry run pytest --cov=. --cov-report=term
+
+      - name: Generate tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(python -c "
+            import tomllib
+            with open('pyproject.toml', 'rb') as f:
+              print(tomllib.load(lib)['project']['version'])
+          ")
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v$version"
+          git push origin "v$version"

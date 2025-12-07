@@ -1,6 +1,6 @@
 [project]
 name = "rekor-verification"
-version = "0.1.1"
+version = "4.0.1"
 description = "A Python script for verifying Rekor logs"
 authors = [{ name = "Alexander Hom", email = "alexanderhom19@gmail.com" }]
 readme = "README.md"
@@ -34,7 +34,8 @@ dev = [
     "pytest-cov (>=7.0.0,<8.0.0)",
     "jsonschema (>=4.25.1,<5.0.0)",
     "cyclonedx-bom (>=7.2.1,<8.0.0)",
-    "flake8-pyproject (>=1.2.4,<2.0.0)"]
+    "flake8-pyproject (>=1.2.4,<2.0.0)",
+]
 
 [project.scripts]
 rekor-verification = "rekor_verification.main:main"
