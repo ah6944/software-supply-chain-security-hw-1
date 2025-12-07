@@ -33,7 +33,8 @@ dev = [
     "pytest (>=9.0.0,<10.0.0)",
     "pytest-cov (>=7.0.0,<8.0.0)",
     "jsonschema (>=4.25.1,<5.0.0)",
-    "cyclonedx-bom (>=7.2.1,<8.0.0)"]
+    "cyclonedx-bom (>=7.2.1,<8.0.0)",
+    "flake8-pyproject (>=1.2.4,<2.0.0)"]
 
 [project.scripts]
 rekor-verification = "rekor_verification.main:main"
