@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock
-from main import handle_response
+from rekor_verification.main import handle_response
 
 def test_handle_response_success():
     res = Mock()

@@ -1,5 +1,5 @@
 import os
-from main import save_json_to_file
+from rekor_verification.main import save_json_to_file
 
 def test_save_json_to_file():
     json_str = "{\"foo\": \"bar\"}"

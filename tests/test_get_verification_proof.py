@@ -1,4 +1,4 @@
-from main import get_verification_proof, get_log_entry
+from rekor_verification.main import get_verification_proof, get_log_entry
 
 def test_get_verification_proof():
     log_index = "512770004"

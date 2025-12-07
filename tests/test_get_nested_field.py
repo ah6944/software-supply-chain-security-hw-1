@@ -1,4 +1,4 @@
-from main import get_nested_field
+from rekor_verification.main import get_nested_field
 
 def test_get_nested_field():
     data = { "foo": { "bar": "123" } }

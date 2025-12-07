@@ -1,4 +1,4 @@
-from main import get_log_entry
+from rekor_verification.main import get_log_entry
 from jsonschema import validate
 
 log_entry_schema = {

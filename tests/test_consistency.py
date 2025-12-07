@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from main import main
+from rekor_verification.main import main
 
 def test_consistency(capsys):
     tree_id = "1193050959916656506"

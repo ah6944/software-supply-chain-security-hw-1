@@ -1,6 +1,6 @@
 import json
 from unittest.mock import patch
-from main import main
+from rekor_verification.main import main
 
 def test_inclusion(capsys):
     artifact_file = "artifact.bundle"
