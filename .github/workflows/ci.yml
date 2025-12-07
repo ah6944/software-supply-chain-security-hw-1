@@ -50,7 +50,7 @@ jobs:
 
       - name: Generate tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           version=$(python -c "
           import tomllib
