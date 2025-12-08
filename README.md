@@ -2,6 +2,7 @@
 
 [![release](https://github.com/ah6944/software-supply-chain-security-hw-1/actions/workflows/cd.yml/badge.svg)](https://github.com/ah6944/software-supply-chain-security-hw-1/actions/workflows/cd.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/ah6944/software-supply-chain-security-hw-1/badge)](https://scorecard.dev/viewer/?uri=github.com/ah6944/software-supply-chain-security-hw-1)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11576/badge)](https://www.bestpractices.dev/projects/11576)
 
 ## Overview
 In software development, artifact signing is a method to help increase the
