@@ -1,5 +1,7 @@
 # Python Rekor Signed Artifact Verification Script
 
+[![release](https://github.com/ah6944/software-supply-chain-security-hw-1/actions/workflows/cd.yml/badge.svg)](https://github.com/ah6944/software-supply-chain-security-hw-1/actions/workflows/cd.yml)
+
 ## Overview
 In software development, artifact signing is a method to help increase the
 security of the software by associating an artifact with the person who
